@@ -2,6 +2,7 @@
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Runtime.Intrinsics.Arm;
+using System.Text;
 using CustomDolphinController.Enums;
 using CustomDolphinController.Structs;
 
@@ -30,8 +31,8 @@ namespace CustomDolphinController.Helpers
             
             if (!BitConverter.IsLittleEndian)
             {
-                header.ProtocolVersion = OperationsHelper.SwapEndian(header.ProtocolVersion);
-                header.PacketLength = OperationsHelper.SwapEndian(header.PacketLength);
+                header.ProtocolVersion = (ushort) OperationsHelper.SwapEndian(header.ProtocolVersion);
+                header.PacketLength = (ushort) OperationsHelper.SwapEndian(header.PacketLength);
                 header.CRC32 = OperationsHelper.SwapEndian(header.CRC32);
                 header.ClientId = OperationsHelper.SwapEndian(header.ClientId);
                 header.MessageType = (MessageType)OperationsHelper.SwapEndian((uint)header.MessageType);
@@ -48,10 +49,12 @@ namespace CustomDolphinController.Helpers
             {
                 using (BinaryWriter writer = new BinaryWriter(stream))
                 {
-                    writer.Write(header.MagicString.ToCharArray());//4 bytes
+                    writer.Write(Encoding.UTF8.GetBytes(header.MagicString));//4 bytes
                     writer.Write(header.ProtocolVersion);//2 bytes
-                    writer.Write((uint)0);//packet length will be manually added //4 bytes
-                    writer.Write((uint)0);//crc32 will be manually added //4 bytes
+
+                    //packet length
+                    writer.Write(header.PacketLength);
+                    writer.Write(header.CRC32);
                     writer.Write(header.ClientId);
                     writer.Write((uint)header.MessageType);
                 }
@@ -78,6 +81,9 @@ namespace CustomDolphinController.Helpers
             Array.Copy(header.ToByteArray(), 0, buffer, 0, 20);
             //copy the additional data into the buffer
             Array.Copy(extraData, 0, buffer, 20, extraData.Length);
+            //copy the length of the data into the buffer
+            ushort length = (ushort) (4 + extraData.Length);
+            Array.Copy(BitConverter.GetBytes(length), 0, buffer, 6, BitConverter.GetBytes(length).Length);
             //compute the crc32 checksum and append it to the buffer
             uint crc32 = buffer.ComputeCrc32();
             Array.Copy(BitConverter.GetBytes(crc32), 0, buffer, 8, 4);

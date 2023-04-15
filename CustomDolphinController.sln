@@ -2,6 +2,10 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CustomDolphinController", "CustomDolphinController\CustomDolphinController.csproj", "{BE71756B-E265-4409-87CE-6AFAF7A34C34}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CustomDolphinController.Tests", "CustomDolphinController.Tests\CustomDolphinController.Tests.csproj", "{B544692F-59D9-4174-8708-785BB82FDB7F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CustomDolphinController.Example", "CustomDolphinController.Example\CustomDolphinController.Example.csproj", "{9E20F933-1988-4FE7-867A-91DC0F31A31B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +16,13 @@ Global
 		{BE71756B-E265-4409-87CE-6AFAF7A34C34}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BE71756B-E265-4409-87CE-6AFAF7A34C34}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BE71756B-E265-4409-87CE-6AFAF7A34C34}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B544692F-59D9-4174-8708-785BB82FDB7F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B544692F-59D9-4174-8708-785BB82FDB7F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B544692F-59D9-4174-8708-785BB82FDB7F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B544692F-59D9-4174-8708-785BB82FDB7F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9E20F933-1988-4FE7-867A-91DC0F31A31B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9E20F933-1988-4FE7-867A-91DC0F31A31B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9E20F933-1988-4FE7-867A-91DC0F31A31B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9E20F933-1988-4FE7-867A-91DC0F31A31B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

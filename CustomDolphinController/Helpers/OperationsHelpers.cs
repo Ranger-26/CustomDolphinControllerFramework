@@ -2,6 +2,7 @@
 {
     public static class OperationsHelper
     {
+        //compute checksum
         public static uint ComputeCrc32(this byte[] bytes)
         {
             uint crc = uint.MaxValue;

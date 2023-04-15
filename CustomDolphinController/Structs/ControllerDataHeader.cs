@@ -26,7 +26,7 @@ namespace CustomDolphinController.Structs
                     writer.Write((byte)SlotState);
                     writer.Write((byte)DeviceModel);
                     writer.Write((byte)ConnectionType);
-                    writer.Write((byte)MacAddress);
+                    writer.Write(UInt48.GetBytes(MacAddress));
                     writer.Write((byte)BatteryStatus);
                 }
             }

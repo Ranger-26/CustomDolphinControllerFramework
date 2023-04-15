@@ -1,4 +1,4 @@
-﻿namespace ControllerServer
+﻿namespace CustomDolphinController.Enums
 {
     public enum MessageType
     {

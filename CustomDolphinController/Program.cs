@@ -1,7 +1,8 @@
 ﻿using System;
 using System.IO.Ports;
+using CustomDolphinController.Core;
 
-namespace ControllerServer
+namespace CustomDolphinController
 {
     class Program
     {

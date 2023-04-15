@@ -1,4 +1,4 @@
-﻿namespace ControllerServer
+﻿namespace CustomDolphinController
 {
     public struct InputData
     {

@@ -1,21 +1,13 @@
-﻿namespace CustomDolphinController.Helpers
+﻿using Force.Crc32;
+
+namespace CustomDolphinController.Helpers
 {
     public static class OperationsHelper
     {
         //compute checksum
         public static uint ComputeCrc32(this byte[] bytes)
         {
-            uint crc = uint.MaxValue;
-            foreach (byte b in bytes)
-            {
-                crc ^= b;
-                for (int i = 0; i < 8; i++)
-                {
-                    uint mask = (uint)-(crc & 1);
-                    crc = (crc >> 1) ^ (0xEDB88320 & mask);
-                }
-            }
-            return ~crc;
+            return Crc32Algorithm.Compute(bytes);
         }
         
         public static uint SwapEndian(uint value)

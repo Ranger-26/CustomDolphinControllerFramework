@@ -1,0 +1,16 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ControllerServer", "ControllerServer\ControllerServer.csproj", "{BE71756B-E265-4409-87CE-6AFAF7A34C34}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{BE71756B-E265-4409-87CE-6AFAF7A34C34}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BE71756B-E265-4409-87CE-6AFAF7A34C34}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BE71756B-E265-4409-87CE-6AFAF7A34C34}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BE71756B-E265-4409-87CE-6AFAF7A34C34}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

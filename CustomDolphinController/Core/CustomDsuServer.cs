@@ -14,13 +14,14 @@ namespace CustomDolphinController.Core
     public class CustomDsuServer
     {
         private Socket _udpServer;
-        private const ushort MAX_PROTOCOL_VERSION = 1001;
+        private const ushort MAX_PROTOCOL_VERSION = 1010;
         private const string SERVER_CODE = "DSUS";
         private uint _serverId;
         public CustomDsuServer()
         {
             _udpServer = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-            _serverId = 2299867765;
+            var r = new Random();
+            _serverId = (uint)r.Next();;
         }
 
         public void Start(int port)
@@ -101,14 +102,20 @@ namespace CustomDolphinController.Core
             PacketHeader header = CreateHeader(MessageType.ConnectedControllersInfo);
             ControllerDataHeader controllerDataHeader = new ControllerDataHeader()
             {
-                Slot = 1,
+                Slot = 0,
                 SlotState = SlotState.Connected,
-                DeviceModel = DeviceModel.NoGyro,
-                ConnectionType = ConnectionType.USB,
+                DeviceModel = DeviceModel.Gyro,
+                ConnectionType = ConnectionType.NotApplicable,
                 MacAddress = GetMacAddress(),
                 BatteryStatus = BatteryStatus.Charged,
             };
-            _udpServer.SendTo(PacketHelpers.CreatePacket(header, controllerDataHeader.GetBytes()), remoteEndPoint);
+
+            //needs a zero byte at the end
+            byte[] extraBytes = new byte[controllerDataHeader.GetBytes().Length + 1];
+            Array.Copy(controllerDataHeader.GetBytes(), 0, extraBytes, 0,  controllerDataHeader.GetBytes().Length);
+            char zeroByte = '\0';
+            extraBytes[controllerDataHeader.GetBytes().Length] = (byte) zeroByte;
+            _udpServer.SendTo(PacketHelpers.CreatePacket(header, extraBytes), remoteEndPoint);
         }
 
         private PacketHeader CreateHeader(MessageType type)

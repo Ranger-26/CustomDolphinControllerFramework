@@ -5,6 +5,7 @@ using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Threading;
+using CustomDolphinController.Core.ControllerFramework;
 using CustomDolphinController.Enums;
 using CustomDolphinController.Helpers;
 using CustomDolphinController.Structs;
@@ -18,14 +19,17 @@ namespace CustomDolphinController.Core
         private const ushort MAX_PROTOCOL_VERSION = 1001;
         private const string SERVER_CODE = "DSUS";
         private uint _serverId;
-
         private uint _packetNumber;
-        public CustomDsuServer()
+
+        private ControllerBase _controllerBase;
+        
+        public CustomDsuServer(ControllerBase controllerBase)
         {
             _udpServer = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
             _packetNumber = 0;
             var r = new Random();
-            _serverId = (uint)r.Next();;
+            _serverId = (uint)r.Next();
+            _controllerBase = controllerBase;
         }
 
         public void Start(int port)
@@ -123,28 +127,17 @@ namespace CustomDolphinController.Core
             }
             Console.WriteLine();
             //send data
-            for (int i = 0; i < array.Length; i++)
-            {
-                PacketHeader header = CreateHeader(MessageType.ConnectedControllersInfo);
-            
-                ControllerDataHeader controllerDataHeader = new ControllerDataHeader()
-                {
-                    Slot = 0,
-                    SlotState = SlotState.Connected,
-                    DeviceModel = DeviceModel.NotApplicable,
-                    ConnectionType = ConnectionType.USB,
-                    MacAddress = (UInt48)0,
-                    BatteryStatus = BatteryStatus.Charged,
-                };
+            PacketHeader header = CreateHeader(MessageType.ConnectedControllersInfo);
 
-                //needs a zero byte at the end
-                byte[] extraBytes = new byte[controllerDataHeader.GetBytes().Length + 1];
-                Array.Copy(controllerDataHeader.GetBytes(), 0, extraBytes, 0,  controllerDataHeader.GetBytes().Length);
-                char zeroByte = '\0';
-                extraBytes[controllerDataHeader.GetBytes().Length] = (byte) zeroByte;
+            ControllerDataHeader controllerDataHeader = _controllerBase.GetControllerDataHeader();
+
+            //needs a zero byte at the end
+            byte[] extraBytes = new byte[controllerDataHeader.GetBytes().Length + 1];
+            Array.Copy(controllerDataHeader.GetBytes(), 0, extraBytes, 0,  controllerDataHeader.GetBytes().Length);
+            char zeroByte = '\0';
+            extraBytes[controllerDataHeader.GetBytes().Length] = (byte) zeroByte;
             
-                SendData(PacketHelpers.CreatePacket(header, extraBytes), remoteEndPoint);
-            }
+            SendData(PacketHelpers.CreatePacket(header, extraBytes), remoteEndPoint);
         }
 
         private void SendActualControllerData(byte[] remainingBytes, EndPoint remoteEndPoint)
@@ -159,23 +152,11 @@ namespace CustomDolphinController.Core
                     //create packet header
                     PacketHeader header = CreateHeader(MessageType.ControllerData);
                     //create header for the controller data
-                    ControllerDataHeader controllerDataHeader = new ControllerDataHeader()
-                    {
-                        Slot = slotToReport,
-                        SlotState = SlotState.Connected,
-                        DeviceModel = DeviceModel.NotApplicable,
-                        ConnectionType = ConnectionType.NotApplicable,
-                        MacAddress = (UInt48) 0,
-                        BatteryStatus = BatteryStatus.Charged,
-                    };
+                    ControllerDataHeader controllerDataHeader = _controllerBase.GetControllerDataHeader();
                     
                     Console.WriteLine($"Slot to report about: {slotToReport}");
 
-                    ActualControllerDataInfo info = new ActualControllerDataInfo()
-                    {
-                        IsConnected = true,
-                        PacketNumber = _packetNumber,
-                    };
+                    ActualControllerDataInfo info = _controllerBase.GetActualControllerInfo(_packetNumber);
 
                     List<byte> otherBytes = new List<byte>();
                     otherBytes.AddRange(controllerDataHeader.GetBytes());

@@ -15,7 +15,7 @@ namespace CustomDolphinController.Core
     public class CustomDsuServer
     {
         private Socket _udpServer;
-        private const ushort MAX_PROTOCOL_VERSION = 1010;
+        private const ushort MAX_PROTOCOL_VERSION = 1001;
         private const string SERVER_CODE = "DSUS";
         private uint _serverId;
 
@@ -115,41 +115,45 @@ namespace CustomDolphinController.Core
             {
                 array[i] = (byte) (remainingBytes[i+4] & 0xFF);
             }
-            Console.Write($"Num Ports: {numPorts}, ");
-            Console.Write("Port array: ");
+            //Console.Write($"Num Ports: {numPorts}, ");
+            //Console.Write("Port array: ");
             for (int i = 0; i < array.Length; i++)
             {
                 Console.Write(array[i] + " ");
             }
             Console.WriteLine();
             //send data
-            PacketHeader header = CreateHeader(MessageType.ConnectedControllersInfo);
-            
-            ControllerDataHeader controllerDataHeader = new ControllerDataHeader()
+            for (int i = 0; i < array.Length; i++)
             {
-                Slot = 0,
-                SlotState = SlotState.Connected,
-                DeviceModel = DeviceModel.NotApplicable,
-                ConnectionType = ConnectionType.USB,
-                MacAddress = (UInt48)0,
-                BatteryStatus = BatteryStatus.Charged,
-            };
-
-            //needs a zero byte at the end
-            byte[] extraBytes = new byte[controllerDataHeader.GetBytes().Length + 1];
-            Array.Copy(controllerDataHeader.GetBytes(), 0, extraBytes, 0,  controllerDataHeader.GetBytes().Length);
-            char zeroByte = '\0';
-            extraBytes[controllerDataHeader.GetBytes().Length] = (byte) zeroByte;
+                PacketHeader header = CreateHeader(MessageType.ConnectedControllersInfo);
             
-            SendData(PacketHelpers.CreatePacket(header, extraBytes), remoteEndPoint);
+                ControllerDataHeader controllerDataHeader = new ControllerDataHeader()
+                {
+                    Slot = 0,
+                    SlotState = SlotState.Connected,
+                    DeviceModel = DeviceModel.NotApplicable,
+                    ConnectionType = ConnectionType.USB,
+                    MacAddress = (UInt48)0,
+                    BatteryStatus = BatteryStatus.Charged,
+                };
+
+                //needs a zero byte at the end
+                byte[] extraBytes = new byte[controllerDataHeader.GetBytes().Length + 1];
+                Array.Copy(controllerDataHeader.GetBytes(), 0, extraBytes, 0,  controllerDataHeader.GetBytes().Length);
+                char zeroByte = '\0';
+                extraBytes[controllerDataHeader.GetBytes().Length] = (byte) zeroByte;
+            
+                SendData(PacketHelpers.CreatePacket(header, extraBytes), remoteEndPoint);
+            }
         }
 
         private void SendActualControllerData(byte[] remainingBytes, EndPoint remoteEndPoint)
         {
             RegistrationType actions = (RegistrationType)remainingBytes[0];
-            //Console.WriteLine(actions);
+            Console.WriteLine(actions);
             switch (actions)
             {
+                case RegistrationType.AllControllers:
                 case RegistrationType.SlotBasedRegistration:
                     byte slotToReport = remainingBytes[1];
                     //create packet header
@@ -157,7 +161,7 @@ namespace CustomDolphinController.Core
                     //create header for the controller data
                     ControllerDataHeader controllerDataHeader = new ControllerDataHeader()
                     {
-                        Slot = 0,
+                        Slot = slotToReport,
                         SlotState = SlotState.Connected,
                         DeviceModel = DeviceModel.NotApplicable,
                         ConnectionType = ConnectionType.NotApplicable,

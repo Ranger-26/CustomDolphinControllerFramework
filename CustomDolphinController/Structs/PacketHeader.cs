@@ -7,11 +7,10 @@ namespace CustomDolphinController.Structs
     {
         public string MagicString;//4 bytes
         public ushort ProtocolVersion;//2 bytes
-        public ushort PacketLength;//2 bytes //THIS WILL BE WRITTEN AFTER THE PACKET IS PROCCESSED
-        public uint CRC32;//4 bytes //THIS WILL BE WRITTEN AFTER THE PACKET IS PROCCESSED
+        public ushort PacketLength;//2 bytes //THIS WILL BE WRITTEN TO THE BUFFER AFTER THE PACKET IS PROCCESSED
+        public uint CRC32;//4 bytes //THIS WILL BE WRITTEN TO THE BUFFER AFTER THE PACKET IS PROCCESSED
         public uint ClientId;//4 bytes
         public MessageType MessageType;//4 bytes
-
         
         public override string ToString()
         {

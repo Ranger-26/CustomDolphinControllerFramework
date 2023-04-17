@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Net.NetworkInformation;
@@ -17,9 +18,12 @@ namespace CustomDolphinController.Core
         private const ushort MAX_PROTOCOL_VERSION = 1010;
         private const string SERVER_CODE = "DSUS";
         private uint _serverId;
+
+        private uint _packetNumber;
         public CustomDsuServer()
         {
             _udpServer = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+            _packetNumber = 0;
             var r = new Random();
             _serverId = (uint)r.Next();;
         }
@@ -32,6 +36,23 @@ namespace CustomDolphinController.Core
             StartServerThread();
         }
 
+        private void SendData(byte[] data, EndPoint endPoint)
+        {
+            _udpServer.SendTo(data, endPoint);
+            _packetNumber += 1;
+        }
+
+        private PacketHeader CreateHeader(MessageType type)
+        {
+            return new PacketHeader()
+            {
+                MagicString = SERVER_CODE,
+                ProtocolVersion = MAX_PROTOCOL_VERSION,
+                ClientId = _serverId,
+                MessageType = type
+            };
+        }
+        
         public void StartServerThread()
         {
             new Thread(() =>
@@ -73,17 +94,20 @@ namespace CustomDolphinController.Core
                 case MessageType.ProtocolVersionInfo:
                     //never requested
                     byte[] versionBytes = BitConverter.GetBytes(MAX_PROTOCOL_VERSION);
-                    _udpServer.SendTo(PacketHelpers.CreatePacket(new PacketHeader(), versionBytes), endPoint);
+                    SendData(PacketHelpers.CreatePacket(new PacketHeader(), versionBytes), endPoint);
                     break;
                 case MessageType.ConnectedControllersInfo:
-                    HandleConnectedControllersInfo(remainingBytes, endPoint);
+                    SendConnectedControllersInfo(remainingBytes, endPoint);
+                    break;
+                case MessageType.ControllerData:
+                    SendActualControllerData(remainingBytes, endPoint);
                     break;
                 default:
                     break;
             }
         }
 
-        private void HandleConnectedControllersInfo(byte[] remainingBytes, EndPoint remoteEndPoint)
+        private void SendConnectedControllersInfo(byte[] remainingBytes, EndPoint remoteEndPoint)
         {
             int numPorts = BitConverter.ToInt32(remainingBytes, 0);
             byte[] array = new byte[numPorts];
@@ -100,13 +124,14 @@ namespace CustomDolphinController.Core
             Console.WriteLine();
             //send data
             PacketHeader header = CreateHeader(MessageType.ConnectedControllersInfo);
+            
             ControllerDataHeader controllerDataHeader = new ControllerDataHeader()
             {
                 Slot = 0,
                 SlotState = SlotState.Connected,
-                DeviceModel = DeviceModel.Gyro,
-                ConnectionType = ConnectionType.NotApplicable,
-                MacAddress = GetMacAddress(),
+                DeviceModel = DeviceModel.NotApplicable,
+                ConnectionType = ConnectionType.USB,
+                MacAddress = (UInt48)0,
                 BatteryStatus = BatteryStatus.Charged,
             };
 
@@ -115,46 +140,53 @@ namespace CustomDolphinController.Core
             Array.Copy(controllerDataHeader.GetBytes(), 0, extraBytes, 0,  controllerDataHeader.GetBytes().Length);
             char zeroByte = '\0';
             extraBytes[controllerDataHeader.GetBytes().Length] = (byte) zeroByte;
-            _udpServer.SendTo(PacketHelpers.CreatePacket(header, extraBytes), remoteEndPoint);
+            
+            SendData(PacketHelpers.CreatePacket(header, extraBytes), remoteEndPoint);
         }
 
-        private PacketHeader CreateHeader(MessageType type)
+        private void SendActualControllerData(byte[] remainingBytes, EndPoint remoteEndPoint)
         {
-            return new PacketHeader()
+            RegistrationType actions = (RegistrationType)remainingBytes[0];
+            //Console.WriteLine(actions);
+            switch (actions)
             {
-                MagicString = SERVER_CODE,
-                ProtocolVersion = MAX_PROTOCOL_VERSION,
-                ClientId = _serverId,
-                MessageType = type
-            };
+                case RegistrationType.SlotBasedRegistration:
+                    byte slotToReport = remainingBytes[1];
+                    //create packet header
+                    PacketHeader header = CreateHeader(MessageType.ControllerData);
+                    //create header for the controller data
+                    ControllerDataHeader controllerDataHeader = new ControllerDataHeader()
+                    {
+                        Slot = 0,
+                        SlotState = SlotState.Connected,
+                        DeviceModel = DeviceModel.NotApplicable,
+                        ConnectionType = ConnectionType.NotApplicable,
+                        MacAddress = (UInt48) 0,
+                        BatteryStatus = BatteryStatus.Charged,
+                    };
+                    
+                    Console.WriteLine($"Slot to report about: {slotToReport}");
+
+                    ActualControllerDataInfo info = new ActualControllerDataInfo()
+                    {
+                        IsConnected = true,
+                        PacketNumber = _packetNumber,
+                    };
+
+                    List<byte> otherBytes = new List<byte>();
+                    otherBytes.AddRange(controllerDataHeader.GetBytes());
+                    otherBytes.AddRange(info.GetBytes());
+
+                    SendData(PacketHelpers.CreatePacket(header, otherBytes.ToArray()), remoteEndPoint);
+                    
+                    break;
+                default:
+                    break;
+            }
         }
         
-        public static UInt48 GetMacAddress()
-        {
-            NetworkInterface[] interfaces = NetworkInterface.GetAllNetworkInterfaces();
-            foreach (NetworkInterface ni in interfaces)
-            {
-                if (ni.NetworkInterfaceType == NetworkInterfaceType.Ethernet ||
-                    ni.NetworkInterfaceType == NetworkInterfaceType.Wireless80211)
-                {
-                    PhysicalAddress address = ni.GetPhysicalAddress();
-                    byte[] bytes = address.GetAddressBytes();
-                    if (bytes.Length >= 6)
-                    {
-                        UInt48 value = (UInt48)(
-                            ((UInt64)bytes[0] << 40) |
-                            ((UInt64)bytes[1] << 32) |
-                            ((UInt64)bytes[2] << 24) |
-                            ((UInt64)bytes[3] << 16) |
-                            ((UInt64)bytes[4] << 8) |
-                            (UInt64)bytes[5]
-                        );
-                        return value;
-                    }
-                }
-            }
-            throw new Exception("MAC address not found");
-        }
-
+        
+        
+        
     }
 }

@@ -49,7 +49,7 @@ namespace CustomDolphinController
             }
             */
             CustomDsuServer server = new CustomDsuServer();
-            server.Start(26762);
+            server.Start(26760);
         }
     }
 }

@@ -11,8 +11,7 @@ namespace CustomDolphinController.Core.ControllerFramework
         
         public ControllerBase()
         {
-            UpdateThread = new Thread(Update);
-            UpdateThread.Start();
+            
         }
 
         protected abstract bool RequiresMacAddress { get; set; }
@@ -42,6 +41,12 @@ namespace CustomDolphinController.Core.ControllerFramework
             };
         }
 
+
+        public virtual bool Initialize()
+        {
+            return true;
+        }
+        
         public virtual void Update()
         {
             

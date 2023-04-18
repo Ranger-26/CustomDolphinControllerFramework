@@ -11,7 +11,7 @@ namespace CustomDolphinController.Example
     {
         static void Main(string[] args)
         {
-            new CustomDsuServer(new TestController()).Start(26760);
+            new CustomDsuServer(new ArduinoController()).Start(26760);
         }
     }
 }

@@ -25,6 +25,11 @@ namespace CustomDolphinController.Core
         
         public CustomDsuServer(ControllerBase controllerBase)
         {
+            if (!controllerBase.Initialize())
+            {
+                throw new Exception("Controller failed to initialize!");
+            }
+            
             _udpServer = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
             _packetNumber = 0;
             var r = new Random();
@@ -154,7 +159,7 @@ namespace CustomDolphinController.Core
                     //create header for the controller data
                     ControllerDataHeader controllerDataHeader = _controllerBase.GetControllerDataHeader();
                     
-                    Console.WriteLine($"Slot to report about: {slotToReport}");
+//                    Console.WriteLine($"Slot to report about: {slotToReport}");
 
                     ActualControllerDataInfo info = _controllerBase.GetActualControllerInfo(_packetNumber);
 

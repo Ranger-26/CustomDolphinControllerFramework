@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO.Ports;
 using System.Threading;
 using CustomDolphinController.Core.ControllerFramework;
@@ -19,12 +20,15 @@ namespace CustomDolphinController.Example
         private InputData _lastInputData;
 
         private volatile bool _recivedRequest = false;
-        
+
+        private Stopwatch _stopwatch;
         public override bool Initialize()
         {
+            _stopwatch = new Stopwatch();
+            _stopwatch.Start();
             new Thread(() =>
             {
-                SerialPort port = new SerialPort("COM3", 9600); // replace COM3 with the port name of your Arduino and 9600 with the baud rate you've set on the Arduino
+                SerialPort port = new SerialPort("COM3", 115200); // replace COM3 with the port name of your Arduino and 9600 with the baud rate you've set on the Arduino
                 port.Open();
 
                 Console.WriteLine("Started listening for inputs.");
@@ -32,14 +36,17 @@ namespace CustomDolphinController.Example
                 {
                     while (true)
                     {
+                        string data = port.ReadLine(); // read a line of data from the serial port
+                        InputData inputData = InputData.ParseInput(data);
                         if (_recivedRequest)
                         {
-                            string data = port.ReadLine(); // read a line of data from the serial port
-                            InputData inputData = InputData.ParseInput(data);
-                            _inputs.Enqueue(inputData);
+                            Console.WriteLine($"Enqueing: {inputData}");
+                            _lastInputData = inputData;
                         }
-                            
-                        //Console.WriteLine(InputData.ParseInput(data)); // print the data to the console
+                        else
+                        {
+                            Console.WriteLine($"Current data: {inputData}");
+                        }
                     }
                 }
                 catch (Exception e)
@@ -79,23 +86,26 @@ namespace CustomDolphinController.Example
         
         public override ActualControllerDataInfo GetActualControllerInfo(uint packetNumber)
         {
+            /*
             if (_inputs.TryDequeue(out InputData data))
             {
+                Console.WriteLine($"Recieving: {data}");
                 _lastInputData = data;
                 return GetControllerData(packetNumber, data);
             }
             Console.WriteLine("Could not find any new inputs, returning the last input.");
+            */
             return GetControllerData(packetNumber, _lastInputData);
         }
 
 
         private ActualControllerDataInfo GetControllerData(uint packetNumber, InputData data)
         {
-            Console.WriteLine(data);
             if (!_recivedRequest)
             {
                 _recivedRequest = true;
             }
+            
             return new ActualControllerDataInfo()
             {
                 IsConnected = IsConnected(),

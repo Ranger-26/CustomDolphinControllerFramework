@@ -53,7 +53,7 @@ namespace CustomDolphinController.Example
 
         protected override BatteryStatus GetBatteryStatus()
         {
-            return BatteryStatus.Low;
+            return BatteryStatus.Charged;
         }
 
         protected override ConnectionType GetConnectionType()

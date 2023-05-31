@@ -184,6 +184,7 @@ namespace CustomDolphinController.Core
 
         private void SendActualControllerData(byte[] remainingBytes, EndPoint remoteEndPoint)
         {
+            //TODO:handle slot ip endpoints
             RegistrationType actions = (RegistrationType)remainingBytes[0];
             Console.WriteLine(actions);
             switch (actions)

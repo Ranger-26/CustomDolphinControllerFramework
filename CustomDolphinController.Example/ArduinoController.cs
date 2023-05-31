@@ -28,25 +28,17 @@ namespace CustomDolphinController.Example
             _stopwatch.Start();
             new Thread(() =>
             {
-                SerialPort port = new SerialPort("COM3", 115200); // replace COM3 with the port name of your Arduino and 9600 with the baud rate you've set on the Arduino
+                SerialPort port = new SerialPort("COM3", 9600); // replace COM3 with the port name of your Arduino and 9600 with the baud rate you've set on the Arduino
                 port.Open();
 
-                Console.WriteLine("Started listening for inputs.");
+                Console.WriteLine("Arduino Controller started listening for inputs.");
                 try
                 {
                     while (true)
                     {
                         string data = port.ReadLine(); // read a line of data from the serial port
                         InputData inputData = InputData.ParseInput(data);
-                        if (_recivedRequest)
-                        {
-                            Console.WriteLine($"Enqueing: {inputData}");
-                            _lastInputData = inputData;
-                        }
-                        else
-                        {
-                            Console.WriteLine($"Current data: {inputData}");
-                        }
+                        _lastInputData = inputData;
                     }
                 }
                 catch (Exception e)
@@ -61,7 +53,7 @@ namespace CustomDolphinController.Example
 
         protected override BatteryStatus GetBatteryStatus()
         {
-            return BatteryStatus.Charged;
+            return BatteryStatus.Low;
         }
 
         protected override ConnectionType GetConnectionType()
@@ -105,7 +97,6 @@ namespace CustomDolphinController.Example
             {
                 _recivedRequest = true;
             }
-            
             return new ActualControllerDataInfo()
             {
                 IsConnected = IsConnected(),

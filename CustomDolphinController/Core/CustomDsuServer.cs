@@ -22,7 +22,7 @@ namespace CustomDolphinController.Core
         private uint _packetNumber;
 
         private ControllerBase _controllerBase;
-        
+        private EndPoint _controllerDataEndpoint;
         public CustomDsuServer(ControllerBase controllerBase)
         {
             if (!controllerBase.Initialize())
@@ -42,7 +42,8 @@ namespace CustomDolphinController.Core
             IPEndPoint localEndPoint = new IPEndPoint(IPAddress.Any, port);
             _udpServer.Bind(localEndPoint);
             Console.WriteLine($"UDP Server started on port {port}");
-            StartServerThread();
+            StartServerListenThread();
+            StartServerSendThread();
         }
 
         private void SendData(byte[] data, EndPoint endPoint)
@@ -62,7 +63,7 @@ namespace CustomDolphinController.Core
             };
         }
         
-        public void StartServerThread()
+        public void StartServerListenThread()
         {
             new Thread(() =>
             {
@@ -81,7 +82,7 @@ namespace CustomDolphinController.Core
                         Array.Copy(buffer, 0, headerBytes, 0, 20);
                         //Get packet header
                         PacketHeader header = PacketHelpers.FromByteArray(headerBytes);
-                        Console.WriteLine($"Got Header: {header}");
+                       // Console.WriteLine($"Got Header: {header}");
                         //Get remaning data from the packet
                         byte[] remainingBytes = new byte[header.PacketLength - 4];
                         Array.Copy(buffer, 20, remainingBytes, 0, header.PacketLength - 4);
@@ -96,8 +97,43 @@ namespace CustomDolphinController.Core
             }).Start();
         }
 
+        public void StartServerSendThread()
+        {
+            new Thread(() =>
+            {
+                try
+                {
+                    while (true)
+                    {
+                        PacketHeader header = CreateHeader(MessageType.ControllerData);
+                        //create header for the controller data
+                        ControllerDataHeader controllerDataHeader = _controllerBase.GetControllerDataHeader();
+                    
+//                    Console.WriteLine($"Slot to report about: {slotToReport}");
+
+                        ActualControllerDataInfo info = _controllerBase.GetActualControllerInfo(_packetNumber);
+
+                        List<byte> otherBytes = new List<byte>();
+                        otherBytes.AddRange(controllerDataHeader.GetBytes());
+                        otherBytes.AddRange(info.GetBytes());
+                        if (_controllerDataEndpoint != null)
+                        {
+                            //Console.WriteLine($"Sending controller data: {info}");
+                            SendData(PacketHelpers.CreatePacket(header, otherBytes.ToArray()), _controllerDataEndpoint);
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                    throw;
+                }
+            }).Start();
+        }
+        
         public void HandleMessage(PacketHeader header, byte[] remainingBytes, EndPoint endPoint)
         {
+            Console.WriteLine($"Got message: Type: {header.MessageType}, Endpoint: {endPoint}");
             switch (header.MessageType)
             {
                 case MessageType.ProtocolVersionInfo:
@@ -109,6 +145,7 @@ namespace CustomDolphinController.Core
                     SendConnectedControllersInfo(remainingBytes, endPoint);
                     break;
                 case MessageType.ControllerData:
+                    _controllerDataEndpoint = endPoint;
                     SendActualControllerData(remainingBytes, endPoint);
                     break;
                 default:

@@ -37,7 +37,9 @@ namespace CustomDolphinController.Example
                     while (true)
                     {
                         string data = port.ReadLine(); // read a line of data from the serial port
+                        Console.WriteLine(data);
                         InputData inputData = InputData.ParseInput(data);
+                        Console.WriteLine(inputData);
                         _lastInputData = inputData;
                     }
                 }
@@ -103,44 +105,71 @@ namespace CustomDolphinController.Example
                 PacketNumber = packetNumber,
                 LeftStickX = (byte) ((float)data.x/4),
                 LeftStickY = (byte) ((float)data.y/4),
-                AnalogA = (byte) (data.buttonState == 0 ? 255 : 0)
+                AnalogA = (byte) (data.buttonAState == 1 ? 255 : 0),
+                AnalogL1 = (byte) (data.buttonJState == 0 ? 255 : 0)
             };
         }
     }
     
-    public struct InputData
+    public struct InputData : IEquatable<InputData>
     {
         public int x;
         public int y;
-        public int buttonState;
+        public int buttonAState;
+        public int buttonJState;
         
         public override string ToString()
         {
-            return $"|x = {x}, y = {y}, button_state = {buttonState}|";
+            return $"|x = {x}, y = {y}, button_a_state = {buttonAState}, button_j_state = {buttonJState}|";
         }
         
-        public static InputData ParseInput(string inputString)
+        public static InputData ParseInput(string input)
         {
             try
             {
-                int xIndex = inputString.IndexOf("x = ") + 4;
-                int yIndex = inputString.IndexOf("y = ") + 4;
-                int buttonIndex = inputString.IndexOf("button_state =") + 14;
+                string[] parts = input.Split(',');
 
-                string xStr = inputString.Substring(xIndex, inputString.IndexOf(",", xIndex) - xIndex).Trim();
-                string yStr = inputString.Substring(yIndex, inputString.IndexOf(",", yIndex) - yIndex).Trim();
-                string buttonStr = inputString.Substring(buttonIndex).Trim();
+                Dictionary<string, int> variables = new Dictionary<string, int>();
 
-                int x = int.Parse(xStr);
-                int y = int.Parse(yStr);
-                int buttonState = int.Parse(buttonStr);
+                foreach (string part in parts)
+                {
+                    string[] keyValue = part.Split('=');
+                    string variableName = keyValue[0].Trim();
+                    string value = keyValue[1].Trim();
 
-                return new InputData { x = x, y = y, buttonState = buttonState };
+                    if (int.TryParse(value, out int parsedValue))
+                    {
+                        variables[variableName] = parsedValue;
+                    }
+                }
+
+                int x = variables["x"];
+                int y = variables["y"];
+                int buttonAState = variables["button_a_state"];
+                int buttonJState = variables["button_j_state"];
+
+                return new InputData { x = x, y = y, buttonAState = buttonAState, buttonJState = buttonJState};
             }
             catch (Exception e)
             {
+                //in case the serial port doesn't read every part of the string
                 return new InputData();
             }
+        }
+
+        public bool Equals(InputData other)
+        {
+            return x == other.x && y == other.y && buttonAState == other.buttonAState && buttonJState == other.buttonJState;
+        }
+
+        public override bool Equals(object obj)
+        {
+            return obj is InputData other && Equals(other);
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(x, y, buttonAState, buttonJState);
         }
     }
 

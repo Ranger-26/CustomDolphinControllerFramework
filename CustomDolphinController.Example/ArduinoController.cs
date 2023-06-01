@@ -13,11 +13,11 @@ namespace CustomDolphinController.Example
     public class ArduinoController : ControllerBase
     {
 
-        private ConcurrentQueue<InputData> _inputs = new();
+        private ConcurrentQueue<ArduinoInputData> _inputs = new();
 
         protected override bool RequiresMacAddress { get; set; } = false;
         
-        private InputData _lastInputData;
+        private ArduinoInputData _lastArduinoInputData;
 
         private volatile bool _recivedRequest = false;
 
@@ -38,9 +38,9 @@ namespace CustomDolphinController.Example
                     {
                         string data = port.ReadLine(); // read a line of data from the serial port
                         Console.WriteLine(data);
-                        InputData inputData = InputData.ParseInput(data);
-                        Console.WriteLine(inputData);
-                        _lastInputData = inputData;
+                        ArduinoInputData arduinoInputData = ArduinoInputData.ParseInput(data);
+                        Console.WriteLine(arduinoInputData);
+                        _lastArduinoInputData = arduinoInputData;
                     }
                 }
                 catch (Exception e)
@@ -89,11 +89,11 @@ namespace CustomDolphinController.Example
             }
             Console.WriteLine("Could not find any new inputs, returning the last input.");
             */
-            return GetControllerData(packetNumber, _lastInputData);
+            return GetControllerData(packetNumber, _lastArduinoInputData);
         }
 
 
-        private ActualControllerDataInfo GetControllerData(uint packetNumber, InputData data)
+        private ActualControllerDataInfo GetControllerData(uint packetNumber, ArduinoInputData data)
         {
             if (!_recivedRequest)
             {
@@ -111,7 +111,7 @@ namespace CustomDolphinController.Example
         }
     }
     
-    public struct InputData : IEquatable<InputData>
+    public struct ArduinoInputData : IEquatable<ArduinoInputData>
     {
         public int x;
         public int y;
@@ -123,7 +123,7 @@ namespace CustomDolphinController.Example
             return $"|x = {x}, y = {y}, button_a_state = {buttonAState}, button_j_state = {buttonJState}|";
         }
         
-        public static InputData ParseInput(string input)
+        public static ArduinoInputData ParseInput(string input)
         {
             try
             {
@@ -148,23 +148,23 @@ namespace CustomDolphinController.Example
                 int buttonAState = variables["button_a_state"];
                 int buttonJState = variables["button_j_state"];
 
-                return new InputData { x = x, y = y, buttonAState = buttonAState, buttonJState = buttonJState};
+                return new ArduinoInputData { x = x, y = y, buttonAState = buttonAState, buttonJState = buttonJState};
             }
             catch (Exception e)
             {
                 //in case the serial port doesn't read every part of the string
-                return new InputData();
+                return new ArduinoInputData();
             }
         }
 
-        public bool Equals(InputData other)
+        public bool Equals(ArduinoInputData other)
         {
             return x == other.x && y == other.y && buttonAState == other.buttonAState && buttonJState == other.buttonJState;
         }
 
         public override bool Equals(object obj)
         {
-            return obj is InputData other && Equals(other);
+            return obj is ArduinoInputData other && Equals(other);
         }
 
         public override int GetHashCode()

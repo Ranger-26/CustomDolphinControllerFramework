@@ -15,7 +15,6 @@ namespace CustomDolphinController.Example
 
         private ConcurrentQueue<ArduinoInputData> _inputs = new();
 
-        protected override bool RequiresMacAddress { get; set; } = false;
         
         private ArduinoInputData _lastArduinoInputData;
 

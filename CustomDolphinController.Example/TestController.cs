@@ -8,8 +8,6 @@ namespace CustomDolphinController.Example
 {
     public class TestController : ControllerBase
     {
-        protected override bool RequiresMacAddress { get; set; } = false;
-
         private Stopwatch _stopwatch;
 
         public TestController()

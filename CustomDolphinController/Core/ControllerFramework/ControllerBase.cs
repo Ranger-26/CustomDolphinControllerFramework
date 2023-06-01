@@ -7,15 +7,7 @@ namespace CustomDolphinController.Core.ControllerFramework
 {
     public abstract class ControllerBase
     {
-        public Thread UpdateThread;
         
-        public ControllerBase()
-        {
-            
-        }
-
-        protected abstract bool RequiresMacAddress { get; set; }
-
         protected abstract BatteryStatus GetBatteryStatus();
 
         protected abstract ConnectionType GetConnectionType();
@@ -28,7 +20,7 @@ namespace CustomDolphinController.Core.ControllerFramework
         
         public abstract ActualControllerDataInfo GetActualControllerInfo(uint packetNumber);
 
-        public ControllerDataHeader GetControllerDataHeader()
+        public virtual ControllerDataHeader GetControllerDataHeader()
         {
             return new ControllerDataHeader()
             {

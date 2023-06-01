@@ -145,7 +145,8 @@ namespace CustomDolphinController.Core
                     SendConnectedControllersInfo(remainingBytes, endPoint);
                     break;
                 case MessageType.ControllerData:
-                    _controllerDataEndpoint = endPoint;
+                    if (_controllerDataEndpoint == null)
+                        _controllerDataEndpoint = endPoint;
                     SendActualControllerData(remainingBytes, endPoint);
                     break;
                 default:

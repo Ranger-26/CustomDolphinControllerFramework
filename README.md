@@ -1,2 +1,2 @@
 # CustomDolphinControllerFramework
-A WIP Framwork to create custom dolphin controllers by implementing a DSU server that runs the cemuhook-protocol
+A WIP Framwork to create custom dolphin emulator controllers by creating a server that implements the cemuhook-protocol

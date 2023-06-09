@@ -13,23 +13,16 @@ namespace CustomDolphinController.Example
     public class ArduinoController : ControllerBase
     {
 
-        private ConcurrentQueue<ArduinoInputData> _inputs = new();
 
         
         private ArduinoInputData _lastArduinoInputData;
 
-        private volatile bool _recivedRequest = false;
 
         public override bool Initialize()
         {
             new Thread(() =>
             {
                 SerialPort port = new SerialPort("COM3", 9600); // replace COM3 with the port name of your Arduino and 9600 with the baud rate you've set on the Arduino
-                Console.WriteLine("Waiting for serial port to be avaliable...");
-                while (!port.IsOpen)
-                {
-                    //wait
-                }
                 port.Open();
 
                 Console.WriteLine("Arduino Controller started listening for inputs.");
@@ -38,9 +31,7 @@ namespace CustomDolphinController.Example
                     while (true)
                     {
                         string data = port.ReadLine(); // read a line of data from the serial port
-                        Console.WriteLine(data);
                         ArduinoInputData arduinoInputData = ArduinoInputData.ParseInput(data);
-                        Console.WriteLine(arduinoInputData);
                         _lastArduinoInputData = arduinoInputData;
                     }
                 }
@@ -96,10 +87,6 @@ namespace CustomDolphinController.Example
 
         private ActualControllerDataInfo GetControllerData(uint packetNumber, ArduinoInputData data)
         {
-            if (!_recivedRequest)
-            {
-                _recivedRequest = true;
-            }
             return new ActualControllerDataInfo()
             {
                 IsConnected = IsConnected(),

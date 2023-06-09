@@ -15,7 +15,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\CustomDolphinController.Example\CustomDolphinController.Example.csproj" />
-      <ProjectReference Include="..\CustomDolphinController\CustomDolphinController.csproj" />
+      <ProjectReference Include="..\CustomDolphinController.Core\CustomDolphinController.Core.csproj" />
     </ItemGroup>
 
 </Project>

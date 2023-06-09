@@ -20,14 +20,16 @@ namespace CustomDolphinController.Example
 
         private volatile bool _recivedRequest = false;
 
-        private Stopwatch _stopwatch;
         public override bool Initialize()
         {
-            _stopwatch = new Stopwatch();
-            _stopwatch.Start();
             new Thread(() =>
             {
                 SerialPort port = new SerialPort("COM3", 9600); // replace COM3 with the port name of your Arduino and 9600 with the baud rate you've set on the Arduino
+                Console.WriteLine("Waiting for serial port to be avaliable...");
+                while (!port.IsOpen)
+                {
+                    //wait
+                }
                 port.Open();
 
                 Console.WriteLine("Arduino Controller started listening for inputs.");

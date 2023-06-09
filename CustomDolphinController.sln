@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CustomDolphinController", "CustomDolphinController\CustomDolphinController.csproj", "{BE71756B-E265-4409-87CE-6AFAF7A34C34}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CustomDolphinController.Core", "CustomDolphinController.Core\CustomDolphinController.Core.csproj", "{BE71756B-E265-4409-87CE-6AFAF7A34C34}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CustomDolphinController.Tests", "CustomDolphinController.Tests\CustomDolphinController.Tests.csproj", "{B544692F-59D9-4174-8708-785BB82FDB7F}"
 EndProject

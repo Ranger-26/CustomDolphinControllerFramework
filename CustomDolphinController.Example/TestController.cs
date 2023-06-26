@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Diagnostics;
-using CustomDolphinController.Core.ControllerFramework;
 using CustomDolphinController.Enums;
 using CustomDolphinController.Structs;
 

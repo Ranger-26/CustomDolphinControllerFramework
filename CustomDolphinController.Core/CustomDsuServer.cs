@@ -5,7 +5,6 @@ using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Threading;
-using CustomDolphinController.Core.ControllerFramework;
 using CustomDolphinController.Enums;
 using CustomDolphinController.Helpers;
 using CustomDolphinController.Structs;

@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO.Ports;
 using System.Threading;
-using CustomDolphinController.Core.ControllerFramework;
 using CustomDolphinController.Enums;
 using CustomDolphinController.Structs;
 
@@ -141,6 +140,7 @@ namespace CustomDolphinController.Example
             catch (Exception e)
             {
                 //in case the serial port doesn't read every part of the string
+                Console.WriteLine(e);
                 return new ArduinoInputData();
             }
         }

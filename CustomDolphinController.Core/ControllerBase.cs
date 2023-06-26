@@ -1,9 +1,8 @@
-﻿using System.Threading;
-using CustomDolphinController.Enums;
+﻿using CustomDolphinController.Enums;
 using CustomDolphinController.Structs;
 using CustomDolphinController.Types;
 
-namespace CustomDolphinController.Core.ControllerFramework
+namespace CustomDolphinController
 {
     public abstract class ControllerBase
     {
@@ -32,7 +31,7 @@ namespace CustomDolphinController.Core.ControllerFramework
                 BatteryStatus = GetBatteryStatus()
             };
         }
-
+        
 
         public virtual bool Initialize()
         {

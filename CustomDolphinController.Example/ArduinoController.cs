@@ -101,6 +101,7 @@ namespace CustomDolphinController.Example
         public int x;
         public int y;
         public int buttonAState;
+        public int buttonBState;
         public int buttonJState;
         
         public override string ToString()
@@ -110,7 +111,6 @@ namespace CustomDolphinController.Example
         
         public static ArduinoInputData ParseInput(string input)
         {
-            Console.WriteLine(input);
             try
             {
                 string[] parts = input.Split(',');
@@ -129,12 +129,13 @@ namespace CustomDolphinController.Example
                     }
                 }
 
-                int x = variables["x"];
-                int y = variables["y"];
-                int buttonAState = variables["button_a_state"];
-                int buttonJState = variables["button_j_state"];
+                int x = variables["X"];
+                int y = variables["Y"];
+                int buttonAState = variables["button_A_state"];
+                int buttonBState = variables["button_B_state"];
+                int buttonJState = variables["button_L_state"];
 
-                return new ArduinoInputData { x = x, y = y, buttonAState = buttonAState, buttonJState = buttonJState};
+                return new ArduinoInputData { x = x, y = y, buttonAState = buttonAState, buttonBState = buttonBState, buttonJState = buttonJState};
             }
             catch (Exception e)
             {

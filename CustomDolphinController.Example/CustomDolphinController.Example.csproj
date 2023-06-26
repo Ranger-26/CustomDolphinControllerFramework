@@ -10,7 +10,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ClCompile Include="ArduinoCode\joystick_code.ino" />
+      <ClCompile Include="arduino_code\arduino_code.ino" />
     </ItemGroup>
 
 </Project>

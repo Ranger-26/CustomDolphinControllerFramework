@@ -1,11 +1,3 @@
- /*
- * Created by ArduinoGetStarted.com
- *
- * This example code is in the public domain
- *
- * Tutorial page: https://arduinogetstarted.com/tutorials/arduino-joystick
- */
-
 #include <ezButton.h>
 
 #define VRX_PIN  A0 // Arduino pin connected to VRX pin

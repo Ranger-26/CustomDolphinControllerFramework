@@ -11,8 +11,6 @@ namespace CustomDolphinController.Example
 {
     public class ArduinoController : ControllerBase
     {
-
-
         
         private ArduinoInputData _lastArduinoInputData;
 

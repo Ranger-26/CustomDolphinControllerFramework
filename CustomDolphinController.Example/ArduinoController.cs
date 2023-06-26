@@ -110,6 +110,7 @@ namespace CustomDolphinController.Example
         
         public static ArduinoInputData ParseInput(string input)
         {
+            Console.WriteLine(input);
             try
             {
                 string[] parts = input.Split(',');
@@ -138,7 +139,7 @@ namespace CustomDolphinController.Example
             catch (Exception e)
             {
                 //in case the serial port doesn't read every part of the string
-                Console.WriteLine(e);
+                //Console.WriteLine(e);
                 return new ArduinoInputData();
             }
         }

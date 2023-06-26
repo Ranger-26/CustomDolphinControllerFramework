@@ -9,4 +9,8 @@
       <ProjectReference Include="..\CustomDolphinController.Core\CustomDolphinController.Core.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ClCompile Include="ArduinoCode\joystick_code.ino" />
+    </ItemGroup>
+
 </Project>

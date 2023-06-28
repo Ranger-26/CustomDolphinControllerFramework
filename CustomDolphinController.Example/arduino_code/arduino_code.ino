@@ -4,8 +4,8 @@
 #define VRY_PIN  A1 // Arduino pin connected to VRY pin
 #define SW_PIN   2  // Arduino pin connected to SW  pin
 
-#define BUTTON_A_PIN 8
-#define BUTTON_B_PIN 9
+#define BUTTON_A_PIN 9
+#define BUTTON_B_PIN 8
 
 //buttons
 ezButton button(SW_PIN);
@@ -41,8 +41,8 @@ void loop() {
   Serial.print(isButtonPressed(BUTTON_A_PIN));
   Serial.print(", button_B_state = ");
   Serial.print(isButtonPressed(BUTTON_B_PIN));
-  Serial.print(", button_L_state = ");
-  Serial.print(bValue);
+  Serial.print(", button_Joy_state = ");
+  Serial.print(!bValue);
   Serial.println("");
 }
 

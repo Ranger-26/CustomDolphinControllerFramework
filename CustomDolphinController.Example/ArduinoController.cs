@@ -20,6 +20,13 @@ namespace CustomDolphinController.Example
             new Thread(() =>
             {
                 SerialPort port = new SerialPort("COM3", 9600); // replace COM3 with the port name of your Arduino and 9600 with the baud rate you've set on the Arduino
+
+                if (port.IsOpen)
+                {
+                    Console.WriteLine("Serial Port is Busy.");
+                    return;
+                }
+                
                 port.Open();
 
                 Console.WriteLine("Arduino Controller started listening for inputs.");
@@ -30,6 +37,7 @@ namespace CustomDolphinController.Example
                         string data = port.ReadLine(); // read a line of data from the serial port
                         ArduinoInputData arduinoInputData = ArduinoInputData.ParseInput(data);
                         _lastArduinoInputData = arduinoInputData;
+                        Console.WriteLine(_lastArduinoInputData);
                     }
                 }
                 catch (Exception e)
@@ -91,7 +99,8 @@ namespace CustomDolphinController.Example
                 LeftStickX = (byte) ((float)data.x/4),
                 LeftStickY = (byte) ((float)data.y/4),
                 AnalogA = (byte) (data.buttonAState == 1 ? 255 : 0),
-                AnalogL1 = (byte) (data.buttonJState == 0 ? 255 : 0)
+                AnalogB = (byte) (data.buttonBState == 1 ? 255 : 0),
+                AnalogL1 = (byte) (data.buttonJState == 1 ? 255 : 0)
             };
         }
     }
@@ -106,7 +115,7 @@ namespace CustomDolphinController.Example
         
         public override string ToString()
         {
-            return $"|x = {x}, y = {y}, button_a_state = {buttonAState}, button_j_state = {buttonJState}|";
+            return $"|x = {x}, y = {y}, button_a_state = {buttonAState}, button_b_state = {buttonBState}, button_j_state = {buttonJState}|";
         }
         
         public static ArduinoInputData ParseInput(string input)
@@ -133,14 +142,14 @@ namespace CustomDolphinController.Example
                 int y = variables["Y"];
                 int buttonAState = variables["button_A_state"];
                 int buttonBState = variables["button_B_state"];
-                int buttonJState = variables["button_L_state"];
+                int buttonJState = variables["button_Joy_state"];
 
                 return new ArduinoInputData { x = x, y = y, buttonAState = buttonAState, buttonBState = buttonBState, buttonJState = buttonJState};
             }
             catch (Exception e)
             {
                 //in case the serial port doesn't read every part of the string
-                //Console.WriteLine(e);
+                Console.WriteLine($"Arduino input parsing error: {e}, caused by {input}");
                 return new ArduinoInputData();
             }
         }

@@ -1,2 +1,2 @@
 # CustomDolphinControllerFramework
-A Framework to create custom dolphin emulator controllers by creating a server that implements the cemuhook-protocol
+Code for creating a custom wii controller with an arduino by implementing the cemu-hook protocol from scratch
